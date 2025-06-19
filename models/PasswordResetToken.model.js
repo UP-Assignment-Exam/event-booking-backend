@@ -3,10 +3,15 @@ const { db, mongoose } = require("./settings/connection")
 
 // Password Reset Token Schema
 const passwordResetTokenSchema = new mongoose.Schema({
-  userId: {
+  adminUserId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'users'
+    ref: 'admin_users'
+  },
+  appUserId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'app_users'
   },
   email: {
     type: String,

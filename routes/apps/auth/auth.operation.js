@@ -107,7 +107,7 @@ const resetPassword = async (req, res) => {
     }
 
     // Find user
-    const user = await AppUser.findById(tokenRecord.userId);
+    const user = await AppUser.findById(tokenRecord.appUserId);
     if (!user) {
       return util.ResFail(req, res, "User not found!");
     }
@@ -124,7 +124,7 @@ const resetPassword = async (req, res) => {
 
     // Delete all other reset tokens for this user
     await PasswordResetToken.deleteMany({
-      userId: user._id,
+      appUserId: user._id,
       _id: { $ne: tokenRecord._id }
     });
 
@@ -159,7 +159,7 @@ const verifyResetToken = async (req, res) => {
       hashedToken,
       expiresAt: { $gt: new Date() },
       used: false
-    }).populate('userId', 'email name');
+    }).populate('appUserId', 'email name');
 
     if (!tokenRecord) {
       return util.ResFail(req, res, "Invalid or expired reset token.");
@@ -197,7 +197,7 @@ const forgotPassword = async (req, res) => {
 
     // Check for existing unexpired token
     const existingToken = await PasswordResetToken.findOne({
-      userId: user._id,
+      appUserId: user._id,
       expiresAt: { $gt: new Date() },
       used: false
     });
@@ -212,11 +212,11 @@ const forgotPassword = async (req, res) => {
     const hashedToken = util.hashToken(resetToken);
 
     // Delete any existing tokens for this user
-    await PasswordResetToken.deleteMany({ userId: user._id });
+    await PasswordResetToken.deleteMany({ appUserId: user._id });
 
     // Create new reset token record
     const tokenRecord = new PasswordResetToken({
-      userId: user._id,
+      appUserId: user._id,
       email: normalizedEmail,
       token: resetToken.substring(0, 8), // Store partial token for reference
       hashedToken,
