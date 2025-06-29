@@ -98,11 +98,9 @@ Visit the API: [http://localhost:8080](http://localhost:8080)
 - 🌍 i18n/multi-language support
 - 📤 File upload support (limit: 50MB)
 
----
-
 ## 🧩 Entity Relationship Diagram
 
-<!-- ![ER Diagram](./er_diagram.png) -->
+```mermaid
 erDiagram
     ADMIN_USERS {
         ObjectId _id PK
@@ -292,13 +290,9 @@ erDiagram
     PROMO_CODES ||--o{ TICKETS : "discount.promoCode"
 
     RIGHTS ||--o{ ROLES : "associatedRights"
+```
 
-    %% Embedded Documents Notes
-    %% EVENTS.ticketTypes contains: name(ObjectId->TICKET_TYPES), price, quantity, soldQuantity
-    %% EVENTS.disabledPurchase contains: unit, value
-    %% TICKETS.discount contains: setBy(ObjectId->ADMIN_USERS), percentage, promoCode(ObjectId->PROMO_CODES)
-
----
+> **Note:** This ERD shows the MongoDB collections and their relationships. Embedded documents like `ticketTypes` in events and `discount` in tickets are noted with "embedded" labels.
 
 ## 📌 Additional Notes
 
