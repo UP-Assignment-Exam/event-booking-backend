@@ -20,6 +20,13 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
 
+app.get("/health", async (req, res) => {
+    res.status(200).json({
+        status: "ok",
+        message: "Server is running",
+        time: new Date().toISOString()
+    });
+});
 app.use("/", require("./routes/index.route"));
 
 //* Connect to MONGODB Database -> listen on PORT
