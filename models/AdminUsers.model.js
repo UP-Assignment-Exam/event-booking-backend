@@ -20,10 +20,16 @@ const AdminSchema = mongoose.Schema(
             trim: true,
         },
         password: { type: String, trim: true },
+        phone: {
+            type: String,
+            required: [true, "Phone number must not be null"],
+            trim: true,
+        },
         email: {
             type: String,
             required: [true, "Email must not be null"],
             trim: true,
+            lowercase: true,
             validate: {
                 validator: (v) => validator.isEmail(v),
                 message: "Invalid email format",
