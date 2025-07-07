@@ -23,6 +23,18 @@ const AdminUserRequestSchema = mongoose.Schema(
       required: [true, "Username must not be null"],
       trim: true,
     },
+    organizationName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    organizationType: { // Add Managment maybe
+      type: String,
+      enum: ['company', 'non-profit', 'government', 'school', 'other'],
+      default: 'company',
+    },
+    industry: String, // Add Managment maybe
+    website: String,
     phone: {
       type: String,
       required: [true, "Phone number must not be null"],

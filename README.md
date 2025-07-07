@@ -32,8 +32,8 @@ A modular and scalable **Node.js** backend for managing users, events, ticketing
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/up-blog.git
-cd up-blog
+git clone https://github.com/UP-Assignment-Exam/event-booking-backend.git
+cd event-booking-backend.git
 ```
 
 ### 2. Install Node Version

@@ -7,7 +7,7 @@ const crypto = require('crypto');
  * @returns {int}
  */
 function defaultPageSize(pageSize) {
-    let max = process.env.PageSize ? process.env.PageSize : 150
+    let max = process.env.MAX_PAGE_SIZE ? process.env.MAX_PAGE_SIZE : 150
     max = parseInt(max)
     pageSize = parseInt(pageSize)
     if (isEmpty(pageSize)) {
@@ -97,6 +97,19 @@ const validateEmail = (email) => {
     return emailRegex.test(email) && email.length <= 254;
 };
 
+const ResListSuss = (req, res, data = [], total = 0, message = "Successfully") => {
+    let defaultPage = defaultPageSize(req.query.MAX_PAGE_SIZE)
+
+    return res.send({
+        status: 200,
+        message: message,
+        data: data,
+        total: total,
+        pageNo: req.query.pageNo ? parseInt(req.query.pageNo) : 1,
+        pageSize: req.query.pageSize ? parseInt(req.query.pageSize) : defaultPage
+    })
+}
+
 const ResSuss = (req, res, data = {}, message = "Successfully") => {
     return res.send({
         status: 200,
@@ -175,5 +188,6 @@ module.exports = {
     ResFail,
     objectId,
     defaultPageSize,
-    defaultPageNo
+    defaultPageNo,
+    ResListSuss
 }

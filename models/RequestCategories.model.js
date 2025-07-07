@@ -1,38 +1,42 @@
 const { db, mongoose } = require("./settings/connection")
 
-const TicketTypeSchema = mongoose.Schema(
+const RequestCategoriesSchema = mongoose.Schema(
     {
-        title: {
+        status: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: "pending"
+        },
+        name: {
             type: String,
             required: [true, "Name must not be null"],
             trim: true,
         },
-        description: {
+        color: {
             type: String,
-            required: [true, "Description must not be null"],
+            required: [true, "Color must not be null"],
             trim: true,
         },
-        imageUrl: {
+        iconUrl: {
             type: String,
-            required: [true, "Image URL must not be null"],
+            required: true,
             trim: true,
         },
-        userId: {
+        createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "admin_users",
-            required: [true, "User ID must not be null"],
+            required: [true, "Created by must not be null"],
         },
-        isActive: {
-            type: Boolean,
-            default: true,
+        actionAt: {
+            type: Date,
         },
-        organization: {
+        actionBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "organizations",
+            ref: "admin_users",
         },
         isDeleted: { type: Boolean, default: false },
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 )
 
-module.exports = db.model("ticket_types", TicketTypeSchema)
+module.exports = db.model("request_categories", RequestCategoriesSchema)

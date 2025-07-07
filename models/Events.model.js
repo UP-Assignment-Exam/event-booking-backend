@@ -12,6 +12,11 @@ const EventSchema = mongoose.Schema(
             required: [true, "Description must not be null"],
             trim: true,
         },
+        organization: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "organizations",
+            required: [true, "Organization must not be null"],
+        },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "admin_users",

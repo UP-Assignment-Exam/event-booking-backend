@@ -36,6 +36,18 @@ const AdminSchema = mongoose.Schema(
             },
         },
         passwordChangedAt: Date,
+        role: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "roles",
+        },
+        isSetup: {
+            type: Boolean,
+            default: true
+        },
+        organization: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "organizations",
+        }
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 )

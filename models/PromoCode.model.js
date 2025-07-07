@@ -4,7 +4,7 @@ const PromoCodeSchema = mongoose.Schema(
     {
         promoCode: {
             type: String,
-            required: [true, "Name must not be null"],
+            required: [true, "Promo Code must not be null"],
             trim: true,
         },
         discountPercentage: {
@@ -37,6 +37,10 @@ const PromoCodeSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "admin_users",
             required: [true, "Created by must not be null"],
+        },
+        startAt: {
+            type: Date,
+            required: [true, "Start date must not be null"],
         },
         expirdAt: {
             type: Date,
