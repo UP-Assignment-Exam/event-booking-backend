@@ -27,7 +27,6 @@ const RoleSchema = mongoose.Schema(
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "admin_users",
-            required: [true, "Created by must not be null"],
         },
         organization: {
             type: mongoose.Schema.Types.ObjectId,

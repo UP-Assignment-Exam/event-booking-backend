@@ -4,6 +4,8 @@ const PasswordResetToken = require("../../../models/PasswordResetToken.model");
 const bcrypt = require('bcryptjs');
 const mailer = require("../../../exports/mailer");
 const jwt = require('jsonwebtoken');
+const AdminuserService = require("../../../services/admin-user.service"); const RolesModel = require("../../../models/Roles.model");
+const AdminUserRequests = require("../../../models/AdminUserRequests.model");
 
 const login = async (req, res) => {
   try {
@@ -30,7 +32,9 @@ const login = async (req, res) => {
         { expiresIn: '1h' }     // token expiry time
       );
 
-      return util.ResSuss(req, res, { token: `Bearer ${token}` }, "Login Successfully!");
+      const publicUser = await AdminuserService.getPublicUser(user._id);
+
+      return util.ResSuss(req, res, { token: `Bearer ${token}`, user: publicUser }, "Login Successfully!");
     }
 
     return util.ResFail(req, res, "Invaild User!");
@@ -42,33 +46,52 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, terms, consents } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      organizationName,
+      website,
+      category,
+      foundedYear,
+      revenue,
+      address,
+      description,
+      requestReason
+    } = req.body;
 
     const checkIfEmailExist = await AdminUser.findOne({ email: email }).catch(error => { throw error; });
     if (util.notEmpty(checkIfEmailExist)) {
       return util.ResFail(req, res, "Email already exists.");
     }
 
-    if (!terms || !consents) {
-      return util.ResFail(req, res, "You must agree to our terms and conditions!");
+    const checkRequestExist = await AdminUserRequests.findOne(
+      { email: email, status: "pending" }
+    );
+    
+    if (util.notEmpty(checkRequestExist)) {
+      return util.ResFail(req, res, "Email already submitted to under reviews. Please wait for the review to complete.");
     }
 
-    // Hash password
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    const user = await AdminUser({
+    const requestOrganization = await AdminUserRequests({
       username: firstName + " " + lastName,
       firstName: firstName,
       lastName: lastName,
       email: email,
-      password: hashedPassword
+      phone: phone,
+      organizationName: organizationName,
+      organizationCategory: category,
+      website: website,
+      foundedYear: foundedYear,
+      revenue: revenue,
+      address: address,
+      description: description,
+      requestReason: requestReason
     }).save();
 
-    if (util.notEmpty(user)) {
-      // ADD: Create default data for the user
-      
-      return util.ResSuss(req, res, null, "Account created successfully!");
+    if (util.notEmpty(requestOrganization)) {
+      return util.ResSuss(req, res, null, "Account requested successfully!");
     }
 
     return util.ResFail(req, res, "Failed to register as our user. Please try it again later!");
@@ -192,7 +215,7 @@ const forgotPassword = async (req, res) => {
 
     // Always return success for security (don't reveal if email exists)
     if (!user) {
-      return util.ResFail(req, res, "If an account with that email exists, we have sent a password reset link.");
+      return util.ResSuss(req, res, {}, "If an account with that email exists, we have sent a password reset link.");
     }
 
     // Check for existing unexpired token
@@ -242,7 +265,7 @@ const forgotPassword = async (req, res) => {
 
     console.log(`Password reset email sent to: ${normalizedEmail}`);
 
-    return util.ResSuss(req, res, null, "Password reset link has been sent to your email address.");
+    return util.ResSuss(req, res, null, "If an account with that email exists, we have sent a password reset link.");
   } catch (error) {
     console.error('Forgot password error:', error);
     return util.ResFail(req, res, "Internal server error. Please try again later.");

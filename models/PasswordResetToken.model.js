@@ -5,12 +5,10 @@ const { db, mongoose } = require("./settings/connection")
 const passwordResetTokenSchema = new mongoose.Schema({
   adminUserId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
     ref: 'admin_users'
   },
   appUserId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
     ref: 'app_users'
   },
   email: {

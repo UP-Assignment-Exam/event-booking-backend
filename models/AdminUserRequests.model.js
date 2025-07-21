@@ -28,10 +28,19 @@ const AdminUserRequestSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    organizationType: { // Add Managment maybe
+    organizationCategory: { // Add Managment maybe
       type: String,
-      enum: ['company', 'non-profit', 'government', 'school', 'other'],
-      default: 'company',
+      enum: ['Company', 'Non-Profit', 'Government', 'School', 'Other'],
+      default: 'Company',
+    },
+    foundedYear: Number,
+    revenue: String, // Add Managment maybe
+    address: String,
+    description: String,
+    requestReason: {
+      type: String,
+      required: true,
+      trim: true,
     },
     industry: String, // Add Managment maybe
     website: String,
