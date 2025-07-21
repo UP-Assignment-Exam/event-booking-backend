@@ -11,5 +11,7 @@ router.use("/request-categories", authenticate, require("./request-categories/re
 router.use("/categories", authenticate, require("./categories/categories.route"))
 router.use("/ticket-types", authenticate, require("./ticket-types/ticket-types.route"))
 router.use("/payment-methods", authenticate, require("./payment-methods/payment-methods.route"))
+router.use("/events", authenticate, require("./events/events.route"))
+router.use("/tickets", authenticate, require("./tickets/tickets.route"))
 
 module.exports = router

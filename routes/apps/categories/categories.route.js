@@ -1,6 +1,7 @@
 const express = require("express");
+const app = express();
 
-const Operations = require("./payment-methods.operation");
+const Operations = require("./categories.operation");
 
 const router = express.Router();
 

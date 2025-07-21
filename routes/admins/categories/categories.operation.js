@@ -1,5 +1,5 @@
 const dbUtil = require("../../../exports/db.export");
-const logger = require("../../../exports/logger");
+const logger = require("../../../helpers/logger.helper");
 const util = require("../../../exports/util");
 const Categories = require("../../../models/Categories.model");
 
@@ -29,10 +29,10 @@ const create = async (req, res) => {
       { upsert: true });
 
     if (rsp.modifiedCount > 0) {
-      return util.ResFail(req, res, "Role creation failed");
+      return util.ResFail(req, res, "Category creation failed");
     }
 
-    return util.ResSuss(req, res, {}, "Role created successfully");
+    return util.ResSuss(req, res, {}, "Category created successfully");
   } catch (error) {
     logger.error(error);
     return util.ResFail(req, res, error);
@@ -54,13 +54,13 @@ const list = async (req, res) => {
       return util.ResListSuss(req, res, [], count);
     }
 
-    const roles = await Categories.find(query)
+    const rsp = await Categories.find(query)
       .sort({ createdAt: -1 })
       .skip(dbUtil.defaultPageNo(pageNo))
       .limit(dbUtil.defaultPageSize(pageSize))
       .populate("createdBy", "username firstName lastName");
 
-    return util.ResListSuss(req, res, roles, count);
+    return util.ResListSuss(req, res, rsp, count);
   } catch (error) {
     logger.error(error);
     return util.ResFail(req, res, error);

@@ -4,7 +4,7 @@ const TicketSchema = mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "users",
+            ref: "app_users",
             required: true,
         },
         eventId: {
@@ -59,6 +59,10 @@ const TicketSchema = mongoose.Schema(
             type: Date,
             default: Date.now,
         },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "admin_users"
+        }
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 )

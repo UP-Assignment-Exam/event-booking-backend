@@ -29,7 +29,7 @@ const EventSchema = mongoose.Schema(
         },
         ticketTypes: [
             {
-                name: {
+                ticketTypeId: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "ticket_types",
                 },

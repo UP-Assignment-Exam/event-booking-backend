@@ -1,5 +1,5 @@
 const dbUtil = require("../../../exports/db.export");
-const logger = require("../../../exports/logger");
+const logger = require("../../../helpers/logger.helper");
 const util = require("../../../exports/util");
 const PromoCodes = require("../../../models/PromoCode.model");
 const PromoCodesService = require("../../../services/promo-codes.service");
