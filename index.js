@@ -34,7 +34,7 @@ app.get("/health", async (req, res) => {
     res.status(200).json({
         status: "ok",
         message: "Server is running",
-        time: new Date().toISOS - tring()
+        time: new Date().toISOString()
     });
 });
 app.use("/", require("./routes/index.route"));
