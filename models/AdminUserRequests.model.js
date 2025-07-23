@@ -8,7 +8,12 @@ const AdminUserRequestSchema = mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending"
     },
-    username: {
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "medium"
+    },
+    contactName: {
       type: String,
       required: [true, "Username must not be null"],
       trim: true,

@@ -13,10 +13,10 @@ const objectId = (id) => {
 
 function defaultPageNo(pageNo) {
     if (util.isEmpty(pageNo)) {
-        return 1
+        return 0
     }
     pageNo = parseInt(pageNo)
-    return pageNo < 1 ? 1 : pageNo
+    return pageNo < 0 ? 0 : pageNo - 1
 }
 
 function defaultPageSize(pageSize) {
@@ -151,9 +151,13 @@ function setQueryBetweenDate(query, startDate, endDate, filename, timeZone, noDe
     return query
 }
 
-function setIfNotEmpty(target, key, value) {
-    if (util.notEmpty(value)) {
-        target[key] = value;
+function setIfNotEmpty(target, key, value, { type = "null", skipValue = null }) {
+    if (util.notEmpty(value) && value != skipValue) {
+        if (type === "boolean") {
+            target[key] = value === "true" || value === true;
+        } else {
+            target[key] = value;
+        }
     }
 }
 

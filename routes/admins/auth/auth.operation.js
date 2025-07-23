@@ -74,8 +74,14 @@ const register = async (req, res) => {
       return util.ResFail(req, res, "Email already submitted to under reviews. Please wait for the review to complete.");
     }
 
+    let priority = "medium"; // Default priority, can be changed based on business logic
+    if (revenue === ">10M") {
+      priority = "high";
+    } else if (revenue === "<1M") {
+      priority = "low";
+    } 
     const requestOrganization = await AdminUserRequests({
-      username: firstName + " " + lastName,
+      contactName: firstName + " " + lastName,
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -87,7 +93,8 @@ const register = async (req, res) => {
       revenue: revenue,
       address: address,
       description: description,
-      requestReason: requestReason
+      requestReason: requestReason,
+      priority: priority
     }).save();
 
     if (util.notEmpty(requestOrganization)) {

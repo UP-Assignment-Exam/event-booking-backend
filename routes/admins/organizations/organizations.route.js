@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const Operations = require("./admin-user-requests.operation");
+const Operations = require("./organizations.operation");
 
 const router = express.Router();
 

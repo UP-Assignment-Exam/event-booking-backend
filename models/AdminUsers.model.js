@@ -42,7 +42,7 @@ const AdminSchema = mongoose.Schema(
         },
         isSetup: {
             type: Boolean,
-            default: true
+            default: false
         },
         organization: {
             type: mongoose.Schema.Types.ObjectId,
