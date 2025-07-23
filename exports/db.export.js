@@ -151,7 +151,9 @@ function setQueryBetweenDate(query, startDate, endDate, filename, timeZone, noDe
     return query
 }
 
-function setIfNotEmpty(target, key, value, { type = "null", skipValue = null }) {
+function setIfNotEmpty(target, key, value, options = {}) {
+    const { type = null, skipValue = null } = options;
+    
     if (util.notEmpty(value) && value != skipValue) {
         if (type === "boolean") {
             target[key] = value === "true" || value === true;

@@ -4,6 +4,6 @@ const Operations = require("./rights.operation");
 
 const router = express.Router();
 
-router.get("/", Operations.list);
+router.get("/permissions", Operations.list);
 
 module.exports = router;
