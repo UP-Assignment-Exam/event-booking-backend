@@ -2,7 +2,7 @@ const { db, mongoose } = require("./settings/connection")
 
 const CategoriesSchema = mongoose.Schema(
     {
-        name: {
+        title: {
             type: String,
             required: [true, "Name must not be null"],
             trim: true,
@@ -13,6 +13,11 @@ const CategoriesSchema = mongoose.Schema(
             trim: true,
         },
         iconUrl: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        description: {
             type: String,
             required: true,
             trim: true,

@@ -3,28 +3,28 @@ const logger = require("../../../helpers/logger.helper");
 const util = require("../../../exports/util");
 const Categories = require("../../../models/Categories.model");
 
-const checkDuplicate = async (req, { name }, query = {}) => {
+const checkDuplicate = async (req, { title }, query = {}) => {
   const categoryExists = await Categories.findOne({
     ...query,
-    name: dbUtil.getLike(name),
+    title: dbUtil.getLike(title),
     isDeleted: { $ne: true },
   });
 
   if (util.notEmpty(categoryExists)) {
-    throw Error("Category with this name already exists");
+    throw Error("Category with this title already exists");
   }
 }
 
 const create = async (req, res) => {
   try {
-    const { name, color, iconUrl } = req.body;
+    const { title, color, iconUrl, description } = req.body;
 
-    await checkDuplicate(req, { name });
+    await checkDuplicate(req, { title });
 
-    const upData = { name, color, iconUrl, createdBy: req.user._id, isDeleted: false };
+    const upData = { title, color, iconUrl, description, createdBy: req.user._id, isDeleted: false };
 
     const rsp = await Categories.updateOne(
-      { name: name },
+      { title: title },
       { $set: upData },
       { upsert: true });
 
@@ -47,7 +47,7 @@ const list = async (req, res) => {
       isDeleted: { $ne: true }
     };
 
-    dbUtil.setLikeOrIfNotEmpty(query, ["name"], keyword);
+    dbUtil.setLikeOrIfNotEmpty(query, ["title"], keyword);
 
     const count = await Categories.countDocuments(query);
     if (count === 0) {
@@ -70,16 +70,16 @@ const list = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, color, iconUrl } = req.body;
+    const { title, description, color, iconUrl } = req.body;
 
-    await checkDuplicate(req, { name }, { _id: { $ne: dbUtil.objectId(id) } });
+    await checkDuplicate(req, { title }, { _id: { $ne: dbUtil.objectId(id) } });
 
     const rsp = await Categories.findOneAndUpdate(
       {
         _id: dbUtil.objectId(id),
         isDeleted: { $ne: true },
       },
-      { $set: { name, color, iconUrl } },
+      { $set: { title, description, color, iconUrl } },
       { new: true }
     );
 

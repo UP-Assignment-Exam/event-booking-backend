@@ -11,7 +11,7 @@ const list = async (req, res) => {
       isDeleted: { $ne: true }
     };
 
-    dbUtil.setLikeOrIfNotEmpty(query, ["name"], keyword);
+    dbUtil.setLikeOrIfNotEmpty(query, ["title"], keyword);
 
     const count = await Categories.countDocuments(query);
     if (count === 0) {
