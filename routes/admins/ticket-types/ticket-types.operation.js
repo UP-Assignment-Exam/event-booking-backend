@@ -59,7 +59,7 @@ const list = async (req, res) => {
     dbUtil.setIfNotEmpty(query, "createdBy", userId);
 
     // if (req.user?.role?.superAdmin) {
-      // dbUtil.setIfNotEmpty(query, "organization", organization);
+    // dbUtil.setIfNotEmpty(query, "organization", organization);
     // } else {
     //   dbUtil.setIfNotEmpty(query, "organization", req.user?.organization);
     // }
@@ -137,9 +137,26 @@ const destory = async (req, res) => {
   }
 }
 
+const getAll = async (req, res) => {
+  try {
+    const query = {
+      isDeleted: { $ne: true },
+    };
+
+    const rsp = await TicketTypes.find(query);
+
+    return util.ResSuss(req, res, rsp);
+  } catch (error) {
+    logger.error(error);
+    return util.ResFail(req, res, error);
+  }
+}
+
+
 module.exports = {
   create,
   list,
   update,
-  destory
+  destory,
+  getAll
 }

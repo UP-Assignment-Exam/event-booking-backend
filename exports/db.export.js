@@ -163,10 +163,12 @@ function setQueryBetweenDate(query, startDate, endDate, filename, timeZone, noDe
  */
 function setIfNotEmpty(target, key, value, options = {}) {
     const { type = null, skipValue = null } = options;
-    
+
     if (util.notEmpty(value) && value != skipValue) {
         if (type === "boolean") {
             target[key] = value === "true" || value === true;
+        } else if (type === "objectId") {
+            target[key] = objectId(value)
         } else {
             target[key] = value;
         }

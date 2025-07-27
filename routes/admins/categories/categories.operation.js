@@ -118,9 +118,25 @@ const destory = async (req, res) => {
   }
 }
 
+const getAll = async (req, res) => {
+  try {
+    const query = {
+      isDeleted: { $ne: true },
+    };
+
+    const rsp = await Categories.find(query);
+
+    return util.ResSuss(req, res, rsp);
+  } catch (error) {
+    logger.error(error);
+    return util.ResFail(req, res, error);
+  }
+}
+
 module.exports = {
   create,
   list,
   update,
-  destory
+  destory,
+  getAll
 }

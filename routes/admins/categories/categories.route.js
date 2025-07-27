@@ -5,6 +5,7 @@ const Operations = require("./categories.operation");
 
 const router = express.Router();
 
+router.get("/all", Operations.getAll);
 router.post("/", Operations.create);
 router.get("/", Operations.list);
 router.put("/:id", Operations.update);
