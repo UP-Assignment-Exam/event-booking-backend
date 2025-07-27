@@ -17,19 +17,19 @@ const TicketTypeSchema = mongoose.Schema(
             required: [true, "Image URL must not be null"],
             trim: true,
         },
-        userId: {
+        createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "admin_users",
-            required: [true, "User ID must not be null"],
+            required: [true, "Create by must not be null"],
         },
         isActive: {
             type: Boolean,
             default: true,
         },
-        organization: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "organizations",
-        },
+        // organization: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: "organizations",
+        // },
         isDeleted: { type: Boolean, default: false },
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }

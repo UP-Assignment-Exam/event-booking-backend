@@ -8,6 +8,13 @@ const RoleSchema = mongoose.Schema(
             required: [true, "Name must not be null"],
             trim: true,
         },
+        description: {
+            type: String,
+        },
+        status: {
+            type: String,
+            enum: ["active", "inactive"],
+        },
         superAdmin: {
             type: Boolean,
             default: false,
@@ -28,13 +35,28 @@ const RoleSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "admin_users",
         },
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "admin_users",
+        },
         organization: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "organizations",
         },
         isDeleted: { type: Boolean, default: false },
     },
-    { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
+    {
+        timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+    }
 )
+
+RoleSchema.virtual("userCount", {
+    ref: "admin_users",
+    localField: "_id",
+    foreignField: "role",
+    count: true,
+})
 
 module.exports = db.model("roles", RoleSchema)

@@ -12,7 +12,7 @@ const getOrganizationSuperAdmin = async () => {
 
     const role = new Roles({
         type: "website",
-        name: "Organization Super Admin",
+        name: "Organization Admin",
         organizationSuperAdmin: true,
         associatedRights: [],
         createdBy: null,

@@ -5,7 +5,7 @@ const getPublicUser = async (userId) => {
     return await AdminUsers.findOne(
         { _id: util.objectId(userId) },
         "-password"
-    ).populate("role", "name superAdmin associatedRights")
+    ).populate("role", "name superAdmin organizationSuperAdmin associatedRights")
 }
 
 module.exports = {

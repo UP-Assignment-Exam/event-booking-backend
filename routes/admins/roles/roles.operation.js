@@ -19,12 +19,11 @@ const checkDuplicate = async (req, { name, type }, query = {}) => {
 
 const create = async (req, res) => {
   try {
-    const { type, name } = req.body;
+    const { type, name, description, associatedRights } = req.body;
 
     await checkDuplicate(req, { name, type });
 
     const upData = {
-      associatedRights: [],
       createdBy: req.user._id,
       isDeleted: false,
     };
@@ -36,7 +35,9 @@ const create = async (req, res) => {
     const rsp = await Roles.updateOne({
       type: type || "website",
       name: name,
-      organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
+      organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false },
+      description,
+      associatedRights
     }, { $set: upData }, { upsert: true });
 
     if (rsp.modifiedCount > 0) {
@@ -76,9 +77,27 @@ const list = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(dbUtil.defaultPageNo(pageNo))
       .limit(dbUtil.defaultPageSize(pageSize))
-      .populate("associatedRights", "name description");
+      .populate("userCount")
+      .populate("createdBy", "username firstName lastName");
 
     return util.ResListSuss(req, res, roles, count);
+  } catch (error) {
+    logger.error(error);
+    return util.ResFail(req, res, error);
+  }
+}
+
+const updateStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    await Roles.updateOne(
+      { _id: util.objectId(id) },
+      { $set: { status: status } }
+    )
+
+    return util.ResSuss(req, res, {});
   } catch (error) {
     logger.error(error);
     return util.ResFail(req, res, error);
@@ -88,7 +107,7 @@ const list = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, type, associatedRights } = req.body;
+    const { name, type, associatedRights, description } = req.body;
 
     await checkDuplicate(req, { name, type }, { _id: { $ne: dbUtil.objectId(id) } });
 
@@ -110,7 +129,9 @@ const update = async (req, res) => {
         $set: {
           name,
           type,
-          associatedRights
+          description,
+          associatedRights,
+          updatedBy: req.user?._id
         }
       },
       { new: true }
@@ -164,5 +185,6 @@ module.exports = {
   create,
   list,
   update,
-  destory
+  destory,
+  updateStatus
 }

@@ -8,7 +8,7 @@ const checkDuplicate = async (req, { title }, query = {}) => {
     ...query,
     title: title,
     isDeleted: { $ne: true },
-    organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
+    // organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
   });
 
   if (util.notEmpty(ticketTypesExists)) {
@@ -24,14 +24,13 @@ const create = async (req, res) => {
 
     const rsp = await TicketTypes.updateOne({
       title: title,
-      userId: req.user._id,
-      organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
+      // organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
     }, {
       $set: {
         title: title,
         description: description,
         imageUrl: imageUrl,
-        userId: req.user._id,
+        createdBy: req.user._id,
         isActive: isActive,
         isDeleted: false,
       }
@@ -57,13 +56,13 @@ const list = async (req, res) => {
     };
 
     dbUtil.setIfNotEmpty(query, "isActive", isActive);
-    dbUtil.setIfNotEmpty(query, "userId", userId);
-    
-    if (req.user?.role?.superAdmin) {
-      dbUtil.setIfNotEmpty(query, "organization", organization);
-    } else {
-      dbUtil.setIfNotEmpty(query, "organization", req.user?.organization);
-    }
+    dbUtil.setIfNotEmpty(query, "createdBy", userId);
+
+    // if (req.user?.role?.superAdmin) {
+      // dbUtil.setIfNotEmpty(query, "organization", organization);
+    // } else {
+    //   dbUtil.setIfNotEmpty(query, "organization", req.user?.organization);
+    // }
 
     dbUtil.setLikeOrIfNotEmpty(query, ["title"], keyword);
 
@@ -76,7 +75,7 @@ const list = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(dbUtil.defaultPageNo(pageNo))
       .limit(dbUtil.defaultPageSize(pageSize))
-      .populate("userId", "username firstName lastName");
+      .populate("createdBy", "username firstName lastName");
 
     return util.ResListSuss(req, res, rsp, count);
   } catch (error) {
@@ -93,7 +92,11 @@ const update = async (req, res) => {
     await checkDuplicate(req, { title }, { _id: { $ne: dbUtil.objectId(id) } });
 
     const role = await TicketTypes.findOneAndUpdate(
-      { _id: dbUtil.objectId(id), isDeleted: { $ne: true }, organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false } },
+      {
+        _id: dbUtil.objectId(id),
+        isDeleted: { $ne: true },
+        // organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
+      },
       { $set: { title, description, imageUrl, isActive } },
       { new: true }
     );
@@ -117,7 +120,7 @@ const destory = async (req, res) => {
       {
         _id: dbUtil.objectId(id),
         isDeleted: { $ne: true },
-        organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
+        // organization: req.user?.organization ? dbUtil.objectId(req.user.organization) : { $exists: false }
       },
       { $set: { isDeleted: true } },
       { new: true }

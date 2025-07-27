@@ -6,15 +6,15 @@ const bcrypt = require('bcryptjs');
 
 async function seedRoles() {
     try {
-        const checkExist = await Role.findOne({ superAdmin: true, name: "Admin" });
+        const checkExist = await Role.findOne({ level: "System Admin", name: "Admin" });
         if (checkExist) {
             console.log("Role exists!");
             return checkExist;
         }
 
         await Role({
+            name: "Organization Admin",
             type: "website",
-            name: "Organization Super Admin",
             associatedRights: [],
             organizationSuperAdmin: true,
         }).save();
@@ -22,6 +22,7 @@ async function seedRoles() {
         return await Role({
             name: "Super Admin",
             type: "website",
+            associatedRights: [],
             superAdmin: true,
         }).save();
     } catch (error) {
