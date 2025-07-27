@@ -27,7 +27,7 @@ const login = async (req, res) => {
       const token = jwt.sign(
         { id: String(user._id), email: user.email },
         process.env.JWT_SECRET, // secret key in env vars
-        { expiresIn: '1h' }     // token expiry time
+        { expiresIn: '24h' }     // token expiry time
       );
 
       return util.ResSuss(req, res, { token: `Bearer ${token}` }, "Login Successfully!");
