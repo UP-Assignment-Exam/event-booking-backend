@@ -8,19 +8,19 @@ const nodemailer = require('nodemailer');
 // Configure email transporter (using Gmail as example)
 const createEmailTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail', // or your email provider
-    auth: {
-      user: process.env.EMAIL_USER, // your email
-      pass: process.env.EMAIL_APP_PASSWORD // app-specific password
-    },
-    // Alternative SMTP configuration:
-    // host: 'smtp.gmail.com',
-    // port: 587,
-    // secure: false,
+    // service: 'gmail', // or your email provider
     // auth: {
-    //   user: process.env.EMAIL_USER,
-    //   pass: process.env.EMAIL_APP_PASSWORD
-    // }
+    //   user: process.env.EMAIL_USER, // your email
+    //   pass: process.env.EMAIL_APP_PASSWORD // app-specific password
+    // },
+    // Alternative SMTP configuration:
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_APP_PASSWORD
+    }
   });
 };
 
