@@ -18,6 +18,7 @@ router.use("/ticket-types", require("./ticket-types/ticket-types.route"))
 router.use("/payment-methods", require("./payment-methods/payment-methods.route"))
 router.use("/events", require("./events/events.route"))
 router.use("/tickets", require("./tickets/tickets.route"))
+router.use("/promo-codes", require("./promo-codes/promo-codes.route"))
 
 router.post('/upload', upload.single('file'), uploadFileHandler);
 

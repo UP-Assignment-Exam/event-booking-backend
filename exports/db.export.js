@@ -151,6 +151,16 @@ function setQueryBetweenDate(query, startDate, endDate, filename, timeZone, noDe
     return query
 }
 
+/**
+ * Sets a property on the target object if the value is not empty and not equal to the optional skip value.
+ *
+ * @param {Object} target - The object to set the value on.
+ * @param {string} key - The key of the property to set.
+ * @param {*} value - The value to set if not empty and not equal to skipValue.
+ * @param {Object} [options={}] - Optional settings.
+ * @param {string|null} [options.type=null] - Expected type of value; if "boolean", value will be converted.
+ * @param {*} [options.skipValue=null] - A value that, if matched, will skip assignment.
+ */
 function setIfNotEmpty(target, key, value, options = {}) {
     const { type = null, skipValue = null } = options;
     
