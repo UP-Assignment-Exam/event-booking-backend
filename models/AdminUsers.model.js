@@ -52,6 +52,10 @@ const AdminSchema = mongoose.Schema(
             type: Boolean, 
             default: true
         },
+        location: String,
+        lastLogin: Date,
+        bio: String,
+        avatar: String,
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 )

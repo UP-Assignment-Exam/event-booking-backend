@@ -3,6 +3,7 @@ const dbUtil = require("../../../exports/db.export");
 const logger = require("../../../helpers/logger.helper");
 const AdminUser = require("../../../models/AdminUsers.model");
 const EmailService = require("../../../exports/mailer");
+const AdminUserService = require("../../../services/admin-user.service");
 
 const list = async (req, res) => {
     try {
@@ -185,11 +186,79 @@ const updateStatus = async (req, res) => {
     }
 }
 
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        const {
+            bio, location, email,
+            firstName, lastName, phone,
+            avatar
+        } = req.body;
+
+        if (util.notEmpty(email)) {
+            const emailExists = await AdminUser.findOne({
+                _id: { $ne: dbUtil.objectId(userId) },
+                email: email,
+                isDeleted: { $ne: true }
+            })
+
+            if (util.notEmpty(emailExists)) {
+                return util.ResFail(req, res, "Email already exists!");
+            }
+        }
+
+        await AdminUser.updateOne(
+            { _id: dbUtil.objectId(userId) },
+            {
+                $set: {
+                    bio, location, email,
+                    firstName, lastName, phone,
+                    avatar
+                }
+            }
+        )
+
+        return util.ResSuss(req, res, await AdminUserService.getPublicUser(userId));
+    } catch (error) {
+        logger.error(error);
+        return util.ResFail(req, res, error);
+    }
+}
+
+const updatePassword = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        const { oldPassword, newPassword } = req.body;
+
+        const checkOldPassword = await AdminUser.findOne(
+            {
+                _id: dbUtil.objectId(userId),
+                password: await util.hashedPassword(oldPassword)
+            },
+        )
+        if (util.isEmpty(checkOldPassword)) {
+            return util.ResFail(req, res, "Old password incorrect");
+        }
+
+        await AdminUser.updateOne(
+            { _id: dbUtil.objectId(userid) },
+            { $set: { password: await util.hashedPassword(newPassword) } }
+        )
+
+        return util.ResSuss(req, res, {});
+    } catch (error) {
+        logger.error(error);
+        return util.ResFail(req, res, error);
+    }
+}
+
 module.exports = {
     list,
     create,
     update,
     destroy,
     getStatic,
-    updateStatus
+    updateStatus,
+    updateProfile,
+    updatePassword
 };
