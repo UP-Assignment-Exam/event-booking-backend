@@ -23,5 +23,7 @@ router.use("/tickets", require("./tickets/tickets.route"))
 router.use("/promo-codes", require("./promo-codes/promo-codes.route"))
 
 router.post('/upload', upload.single('file'), uploadFileHandler);
+router.get("/ping", (req, res) => res.send())
+
 
 module.exports = router

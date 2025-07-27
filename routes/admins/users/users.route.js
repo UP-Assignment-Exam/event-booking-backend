@@ -5,7 +5,7 @@ const Operations = require("./users.operations");
 const router = express.Router();
 
 router.put("/profile", Operations.updateProfile);
-router.put("/profile/change-password", Operations.updateProfile);
+router.put("/profile/change-password", Operations.updatePassword);
 
 router.get("/statistics", Operations.getStatic);
 router.get("/", Operations.list);
