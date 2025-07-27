@@ -8,6 +8,7 @@ router.use("/auth", require("./auth/auth.route"))
 
 router.use(authenticate);
 
+router.use("/users", require("./users/users.route"))
 router.use("/roles", require("./roles/roles.route"))
 router.use("/rights", require("./rights/rights.route"))
 router.use("/organizations", require("./organizations/organizations.route"))

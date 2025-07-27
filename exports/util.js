@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 /**
  * Normalize the value of pageSize
@@ -36,7 +37,7 @@ function notEmpty(data) {
 }
 
 const objectId = (id) => {
-    if(notEmpty(id)) {
+    if (notEmpty(id)) {
         return new mongoose.Types.ObjectId(id)
     }
     return null
@@ -149,7 +150,7 @@ function ResFail(req, res, rsp, status, data = null) {
                 response.status = tempObj.status
                 response.errorCode = tempObj.errorCode
                 response.message = tempObj.message
-                if(notEmpty(tempObj.data)) {
+                if (notEmpty(tempObj.data)) {
                     response.data = tempObj.data
                 }
             }
@@ -177,6 +178,36 @@ function ResFail(req, res, rsp, status, data = null) {
     return res.status(status || 400).send(response)
 }
 
+function generateStrongPassword(length = 12) {
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const digits = '0123456789';
+    const special = '@';
+    const all = upper + lower + digits + special;
+
+    const getRandom = (chars) => chars[Math.floor(Math.random() * chars.length)];
+
+    let password = [
+        getRandom(upper),
+        getRandom(special),
+        getRandom(lower),
+        getRandom(digits),
+    ];
+
+    while (password.length < length) {
+        password.push(getRandom(all));
+    }
+
+    // Shuffle the password so fixed characters aren't always at the front
+    password = password.sort(() => 0.5 - Math.random()).join('');
+    return password;
+}
+
+const hashedPassword = async (password) => {
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
+}
 
 module.exports = {
     notEmpty,
@@ -189,5 +220,7 @@ module.exports = {
     objectId,
     defaultPageSize,
     defaultPageNo,
-    ResListSuss
+    ResListSuss,
+    generateStrongPassword,
+    hashedPassword
 }

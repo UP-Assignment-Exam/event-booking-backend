@@ -1,8 +1,9 @@
+const dbUtil = require("../../../exports/db.export");
 const util = require("../../../exports/util");
 const AdminUser = require("../../../models/AdminUsers.model");
 const PasswordResetToken = require("../../../models/PasswordResetToken.model");
 const bcrypt = require('bcryptjs');
-const mailer = require("../../../exports/mailer");
+const EmailService = require("../../../exports/mailer");
 const jwt = require('jsonwebtoken');
 const AdminuserService = require("../../../services/admin-user.service"); const RolesModel = require("../../../models/Roles.model");
 const AdminUserRequests = require("../../../models/AdminUserRequests.model");
@@ -69,7 +70,7 @@ const register = async (req, res) => {
     const checkRequestExist = await AdminUserRequests.findOne(
       { email: email, status: "pending" }
     );
-    
+
     if (util.notEmpty(checkRequestExist)) {
       return util.ResFail(req, res, "Email already submitted to under reviews. Please wait for the review to complete.");
     }
@@ -79,7 +80,7 @@ const register = async (req, res) => {
       priority = "high";
     } else if (revenue === "<1M") {
       priority = "low";
-    } 
+    }
     const requestOrganization = await AdminUserRequests({
       contactName: firstName + " " + lastName,
       firstName: firstName,
@@ -142,13 +143,9 @@ const resetPassword = async (req, res) => {
       return util.ResFail(req, res, "User not found!");
     }
 
-    // Hash new password
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
     // Update user password
     await AdminUser.findByIdAndUpdate(user._id, {
-      password: hashedPassword,
+      password: await util.hashedPassword(newPassword),
       passwordChangedAt: new Date()
     });
 
@@ -255,22 +252,15 @@ const forgotPassword = async (req, res) => {
 
     await tokenRecord.save();
 
-    // Create reset URL
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/reset-password?token=${resetToken}&email=${normalizedEmail}`;
+    const resetUserData = await AdminUser.findOne({
+      _id: dbUtil.objectId(user._id)
+    }).populate("role").populate("organization")
 
-    // Send email
-    const transporter = mailer.createEmailTransporter();
-    const emailTemplate = mailer.getPasswordResetEmailTemplate(resetUrl, normalizedEmail, 15);
-
-    await transporter.sendMail({
-      from: `"Your Expense Tracker" <${process.env.EMAIL_USER}>`,
-      to: normalizedEmail,
-      subject: emailTemplate.subject,
-      html: emailTemplate.html,
-      text: emailTemplate.text
-    });
-
-    console.log(`Password reset email sent to: ${normalizedEmail}`);
+    resetUserData.setupToken = resetToken;
+    resetUserData.setupUrl = `${process.env.FRONTEND_URL}/reset-password?email=${resetUserData.email}&token=${resetToken}`;
+    resetUserData.expirationTime = "1 hour";
+    resetUserData.isFirstTimeSetup = false;
+    await EmailService.sendPasswordSetupEmail(resetUserData);
 
     return util.ResSuss(req, res, null, "If an account with that email exists, we have sent a password reset link.");
   } catch (error) {

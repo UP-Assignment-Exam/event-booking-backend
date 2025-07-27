@@ -5,6 +5,8 @@ const Operations = require("./roles.operation");
 
 const router = express.Router();
 
+router.get("/all", Operations.getAll);
+
 router.post("/", Operations.create);
 router.get("/", Operations.list);
 router.put("/status/:id", Operations.updateStatus);

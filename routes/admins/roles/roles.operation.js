@@ -181,10 +181,27 @@ const destory = async (req, res) => {
   }
 }
 
+const getAll = async (req, res) => {
+  try {
+    const query = {
+      isDeleted: { $ne: true },
+      superAdmin: { $ne: true },
+    };
+
+    const rsp = await Roles.find(query);
+
+    return util.ResSuss(req, res, rsp);
+  } catch (error) {
+    logger.error(error);
+    return util.ResFail(req, res, error);
+  }
+}
+
 module.exports = {
   create,
   list,
   update,
   destory,
-  updateStatus
+  updateStatus,
+  getAll
 }

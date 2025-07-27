@@ -1,15 +1,14 @@
 const express = require("express");
-const app = express();
 
-const Operations = require("./organizations.operation");
+const Operations = require("./users.operations");
 
 const router = express.Router();
 
-router.get("/all", Operations.getAll);
-
-
 router.get("/statistics", Operations.getStatic);
 router.get("/", Operations.list);
+router.post("/", Operations.create);
+router.put("/status/:id", Operations.updateStatus)
 router.put("/:id", Operations.update);
+router.delete("/:id", Operations.destroy);
 
 module.exports = router;

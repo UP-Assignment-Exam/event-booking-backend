@@ -11,12 +11,12 @@ const AdminSchema = mongoose.Schema(
         },
         firstName: {
             type: String,
-            required: [true, "Username must not be null"],
+            required: [true, "First name must not be null"],
             trim: true,
         },
         lastName: {
             type: String,
-            required: [true, "Username must not be null"],
+            required: [true, "Last name must not be null"],
             trim: true,
         },
         password: { type: String, trim: true },
@@ -47,7 +47,11 @@ const AdminSchema = mongoose.Schema(
         organization: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "organizations",
-        }
+        },
+        status: {
+            type: Boolean, 
+            default: true
+        },
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 )

@@ -106,8 +106,21 @@ const update = async (req, res) => {
   }
 }
 
+const getAll = async (req, res) => {
+  try {
+
+    const rsp = await Organizations.find({});
+
+    return util.ResSuss(req, res, rsp);
+  } catch (error) {
+    logger.error(error);
+    return util.ResFail(req, res, error);
+  }
+}
+
 module.exports = {
   getStatic,
   list,
   update,
+  getAll
 }

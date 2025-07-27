@@ -4,7 +4,7 @@ const Operations = require("./payment-methods.operation");
 
 const router = express.Router();
 
-router.get("/static", Operations.getStatic);
+router.get("/statistics", Operations.getStatic);
 router.get("/", Operations.list);
 router.post("/", Operations.create);
 router.put("/status/:id", Operations.updateStatus);

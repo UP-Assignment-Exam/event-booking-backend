@@ -5,6 +5,8 @@ const AdminUserRequests = require("../../../models/AdminUserRequests.model");
 const Organization = require("../../../models/Organizations.model");
 const AdminUser = require("../../../models/AdminUsers.model");
 const RolesService = require("../../../services/roles.service");
+const EmailService = require("../../../exports/mailer");
+const dayjs = require("dayjs");
 
 const getStatic = async (req, res) => {
   try {
@@ -114,6 +116,8 @@ const update = async (req, res) => {
         }
       ).save();
 
+      const temporaryPassword = util.generateStrongPassword();
+
       const adminUser = await new AdminUser(
         {
           username: rsp.contactName,
@@ -123,12 +127,30 @@ const update = async (req, res) => {
           email: rsp.email,
           organization: organization?._id,
           role: organizationSuperAdminRole?._id,
+          password: await util.hashedPassword(temporaryPassword),
         }
       ).save();
 
       if (util.notEmpty(adminUser)) {
-        // TODO: Send Email to setup password
+        const user = await AdminUser.findOne({ _id: dbUtil.objectId(adminUser?._id) }).populate("role").populate("organization")
+        user.temporaryPassword = temporaryPassword;
+        await EmailService.sendUserCreationEmail(user);
       }
+    } else {
+      const submissionDate = dayjs(rsp.createdAt).format("MMMM D, YYYY");
+
+      const rejectionData = {
+        organizationName: rsp.organizationName,
+        contactName: rsp.contactName,
+        contactEmail: rsp.email,
+        submissionDate: submissionDate,
+        reason: rsp.reason || "other", // Your rejection reason key
+        additionalNotes: "We were unable to verify your business registration number. Please provide updated documentation.",
+        reapplicationAllowed: true,
+        // reapplicationPeriod: "30 days"
+      };
+
+      await EmailService.sendOrganizationRejectionEmail(rejectionData);
     }
 
 
