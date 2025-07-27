@@ -37,9 +37,6 @@ app.get("/health", async (req, res) => {
         time: new Date().toISOString()
     });
 });
-app.get('/env-test', (req, res) => {
-  res.send({ frontend: process.env.FRONTEND_URL });
-});
 app.use("/", require("./routes/index.route"));
 
 //* Connect to MONGODB Database -> listen on PORT
