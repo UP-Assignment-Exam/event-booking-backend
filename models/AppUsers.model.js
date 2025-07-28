@@ -30,6 +30,9 @@ const AppSchema = mongoose.Schema(
                 message: "Invalid email format",
             },
         },
+        lastLogoutAt: Date,
+        isActive: Boolean,
+        emailVerified: Boolean,
         passwordChangedAt: Date,
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }

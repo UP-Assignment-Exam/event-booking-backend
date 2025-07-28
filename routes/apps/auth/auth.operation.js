@@ -77,10 +77,10 @@ const login = async (req, res) => {
 // ====================
 const register = async (req, res) => {
   try {
-    const { email, username, firstName, lastName } = req.body;
+    const { email, username, firstName, lastName, password } = req.body;
 
     // Validate input
-    if (!email || !username || !firstName || !lastName) {
+    if (!email || !username || !firstName || !lastName || !password) {
       return util.ResFail(req, res, "All fields are required.");
     }
 
@@ -117,8 +117,7 @@ const register = async (req, res) => {
     }
 
     // Generate temporary password (user will set their own password via OTP)
-    const temporaryPassword = util.generateRandomPassword();
-    const hashedPassword = await util.hashedPassword(temporaryPassword);
+    const hashedPassword = await util.hashedPassword(password);
 
     // Create new user
     const newUser = new User({
