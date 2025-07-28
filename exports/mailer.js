@@ -1677,7 +1677,451 @@ const rejectionData = {
 await sendOrganizationRejectionEmail(rejectionData);
 */
 
+
+// OTP Email Template
+const createOTPEmailTemplate = (userData) => {
+  const {
+    firstName,
+    lastName,
+    username,
+    email,
+    otp,
+    purpose
+  } = userData;
+
+  // Determine email content based on purpose
+  const getContentByPurpose = (purpose) => {
+    switch (purpose) {
+      case 'email_verification':
+        return {
+          title: 'Verify Your Email Address',
+          subtitle: 'Complete your account setup',
+          message: 'Please use the verification code below to confirm your email address and activate your account.',
+          icon: '📧',
+          actionText: 'Enter this code to verify your email:'
+        };
+      case 'password_reset':
+        return {
+          title: 'Reset Your Password',
+          subtitle: 'Secure your account',
+          message: 'You requested to reset your password. Use the code below to proceed with setting a new password.',
+          icon: '🔒',
+          actionText: 'Enter this code to reset your password:'
+        };
+      default:
+        return {
+          title: 'Your Verification Code',
+          subtitle: 'Account verification required',
+          message: 'Please use the verification code below to complete your request.',
+          icon: '🔐',
+          actionText: 'Your verification code:'
+        };
+    }
+  };
+
+  const content = getContentByPurpose(purpose);
+
+  return {
+    subject: `${content.title} - Your Code: ${otp}`,
+    html: `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${content.title}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #f8fafc;
+          }
+          
+          .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          }
+          
+          .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+          }
+          
+          .logo {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+          }
+          
+          .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+          }
+          
+          .header p {
+            font-size: 16px;
+            opacity: 0.9;
+          }
+          
+          .content {
+            padding: 40px 30px;
+          }
+          
+          .welcome-message {
+            text-align: center;
+            margin-bottom: 30px;
+          }
+          
+          .welcome-message h2 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 8px;
+          }
+          
+          .welcome-message p {
+            color: #64748b;
+            font-size: 16px;
+          }
+          
+          .user-info {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            border-left: 4px solid #667eea;
+            text-align: center;
+          }
+          
+          .user-info h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 8px;
+          }
+          
+          .user-details {
+            color: #64748b;
+            font-size: 14px;
+          }
+          
+          .otp-container {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 3px solid #667eea;
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+            text-align: center;
+          }
+          
+          .otp-container h3 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          }
+          
+          .otp-code {
+            font-size: 36px;
+            font-weight: 900;
+            color: #2c3e50;
+            letter-spacing: 8px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 24px;
+            border-radius: 12px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            margin: 16px 0;
+            text-align: center;
+            user-select: all;
+            -webkit-user-select: all;
+            -moz-user-select: all;
+            -ms-user-select: all;
+          }
+          
+          .otp-note {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 12px;
+          }
+          
+          .expiry-notice {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #faad14;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+            text-align: center;
+          }
+          
+          .expiry-notice h4 {
+            color: #faad14;
+            margin-bottom: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          }
+          
+          .expiry-notice p {
+            color: #64748b;
+            font-size: 14px;
+          }
+          
+          .security-tips {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+          }
+          
+          .security-tips h4 {
+            color: #10b981;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          
+          .security-tips ul {
+            color: #64748b;
+            font-size: 14px;
+            margin-left: 16px;
+          }
+          
+          .security-tips li {
+            margin: 6px 0;
+          }
+          
+          .footer {
+            background: #f8fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+          }
+          
+          .footer p {
+            color: #64748b;
+            font-size: 14px;
+            margin: 4px 0;
+          }
+          
+          .footer a {
+            color: #667eea;
+            text-decoration: none;
+          }
+          
+          .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin: 24px 0;
+          }
+          
+          @media (max-width: 600px) {
+            .email-container {
+              margin: 0;
+              border-radius: 0;
+            }
+            
+            .header, .content, .footer {
+              padding: 24px 20px;
+            }
+            
+            .otp-code {
+              font-size: 28px;
+              letter-spacing: 4px;
+              padding: 16px 20px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Header -->
+          <div class="header">
+            <div class="logo">A</div>
+            <h1>${content.title}</h1>
+            <p>${content.subtitle}</p>
+          </div>
+          
+          <!-- Main Content -->
+          <div class="content">
+            <div class="welcome-message">
+              <h2>Hello, ${firstName} ${lastName}!</h2>
+              <p>${content.message}</p>
+            </div>
+            
+            <!-- User Info -->
+            <div class="user-info">
+              <h3>Account Information</h3>
+              <div class="user-details">
+                <strong>@${username}</strong> • ${email}
+              </div>
+            </div>
+            
+            <!-- OTP Container -->
+            <div class="otp-container">
+              <h3>${content.icon} ${content.actionText}</h3>
+              <div class="otp-code">${otp}</div>
+              <p class="otp-note">Copy and paste this code, or type it manually in the app</p>
+            </div>
+            
+            <!-- Expiry Notice -->
+            <div class="expiry-notice">
+              <h4>⏰ Time Sensitive</h4>
+              <p>This verification code will expire in <strong>15 minutes</strong> for security reasons.</p>
+            </div>
+            
+            <!-- Security Tips -->
+            <div class="security-tips">
+              <h4>🛡️ Security Tips</h4>
+              <ul>
+                <li>Never share this code with anyone</li>
+                <li>We will never ask for your code via phone or email</li>
+                <li>If you didn't request this, please ignore this email</li>
+                <li>Contact support if you have any concerns</li>
+              </ul>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Trouble Section -->
+            <div style="text-align: center; margin: 24px 0;">
+              <h3 style="color: #667eea; margin-bottom: 16px;">Having Trouble?</h3>
+              <p style="color: #64748b; margin-bottom: 8px;">If you're having issues with the verification code:</p>
+              <p style="color: #64748b; margin-bottom: 8px;">• Make sure to enter the code exactly as shown</p>
+              <p style="color: #64748b; margin-bottom: 8px;">• Check that the code hasn't expired</p>
+              <p style="color: #64748b;">• Request a new code if needed</p>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="footer">
+            <p><strong>Need Help?</strong></p>
+            <p>If you have any questions or need assistance, please contact our support team:</p>
+            <p>📧 <a href="mailto:support@yourcompany.com">support@yourcompany.com</a></p>
+            <p>📞 +1 (555) 123-4567</p>
+            <div class="divider"></div>
+            <p style="font-size: 12px; color: #94a3b8;">
+              This email was sent automatically. Please do not reply to this email address.
+            </p>
+            <p style="font-size: 12px; color: #94a3b8;">
+              © 2024 Your Company Name. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+${content.title}
+
+Hi ${firstName} ${lastName},
+
+${content.message}
+
+Account: @${username} (${email})
+
+${content.actionText}
+${otp}
+
+IMPORTANT:
+- This code will expire in 15 minutes
+- Never share this code with anyone
+- We will never ask for your code via phone or email
+- If you didn't request this, please ignore this email
+
+Having trouble? Contact our support team:
+Email: support@yourcompany.com
+Phone: +1 (555) 123-4567
+
+Best regards,
+Your App Team
+    `
+  };
+};
+
+// ====================
+// EMAIL SENDING FUNCTION
+// ====================
+
+const sendOTPEmail = async (userData) => {
+  try {
+    const transporter = createEmailTransporter();
+    const emailTemplate = createOTPEmailTemplate(userData);
+
+    const mailOptions = {
+      from: {
+        name: 'Your App Name',
+        address: process.env.EMAIL_USER
+      },
+      to: userData.email,
+      subject: emailTemplate.subject,
+      html: emailTemplate.html,
+      text: emailTemplate.text,
+      // High priority for OTP emails
+      priority: 'high',
+      headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'high'
+      }
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+
+    console.log('✅ OTP email sent successfully:', {
+      messageId: result.messageId,
+      to: userData.email,
+      purpose: userData.purpose,
+      otp: userData.otp.substring(0, 2) + '****' // Log partial OTP for debugging
+    });
+
+    return {
+      success: true,
+      messageId: result.messageId,
+      message: 'OTP email sent successfully'
+    };
+
+  } catch (error) {
+    console.error('❌ Failed to send OTP email:', error);
+
+    return {
+      success: false,
+      error: error.message,
+      message: 'Failed to send OTP email'
+    };
+  }
+};
+
 module.exports = {
+  sendOTPEmail,
+  createOTPEmailTemplate,
   createEmailTransporter,
   sendPasswordSetupEmail,
   sendUserCreationEmail,
