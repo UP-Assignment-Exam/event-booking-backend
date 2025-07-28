@@ -21,4 +21,4 @@ const SetupPasswordTokenSchema = mongoose.Schema(
   { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }
 );
 
-module.exports = db.model("admin_user_requests", SetupPasswordTokenSchema);
+module.exports = db.model("setup_password_tokens", SetupPasswordTokenSchema);

@@ -1,4 +1,3 @@
-
 # 🎟️ Event Booking Backend
 
 A modular and scalable **Node.js** backend for managing users, events, ticketing, and promotions.
@@ -73,6 +72,12 @@ EMAIL_APP_PASSWORD=your_app_password
 FRONTEND_URL=http://localhost:3000
 NODE_ENV=development
 JWT_SECRET=your_secret
+
+# AWS config
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_S3_BUCKET_NAME=
 ```
 
 > ⚠️ Replace `<account>`, `<password>`, `<host>`, and `<db_name>` with your actual MongoDB Atlas credentials.
@@ -112,6 +117,14 @@ erDiagram
         String phone
         String email
         Date passwordChangedAt
+        ObjectId role FK
+        Boolean isSetup
+        ObjectId organization FK
+        Boolean status
+        String location
+        Date lastLogin
+        String bio
+        String avatar
         Date createdAt
         Date updatedAt
     }
@@ -119,9 +132,19 @@ erDiagram
     ADMIN_USER_REQUESTS {
         ObjectId _id PK
         String status "pending|approved|rejected"
-        String username
+        String priority "low|medium|high"
+        String contactName
         String firstName
         String lastName
+        String organizationName
+        String organizationCategory "Company|Non-Profit|Government|School|Other"
+        Number foundedYear
+        String revenue
+        String address
+        String description
+        String requestReason
+        String industry
+        String website
         String phone
         String email
         ObjectId actionBy FK
@@ -137,8 +160,13 @@ erDiagram
         String username
         String firstName
         String lastName
+        String phone
         String password
         String email
+        Boolean emailVerified
+        Boolean isActive
+        String avatar
+        Date lastLogoutAt
         Date passwordChangedAt
         Date createdAt
         Date updatedAt
@@ -146,9 +174,10 @@ erDiagram
 
     CATEGORIES {
         ObjectId _id PK
-        String name
+        String title
         String color
         String iconUrl
+        String description
         ObjectId createdBy FK
         Boolean isDeleted
         Date createdAt
@@ -159,6 +188,7 @@ erDiagram
         ObjectId _id PK
         String title
         String description
+        ObjectId organization FK
         ObjectId createdBy FK
         ObjectId category FK
         Array ticketTypes "embedded"
@@ -175,7 +205,9 @@ erDiagram
         ObjectId _id PK
         String title
         String description
+        String imageUrl
         ObjectId createdBy FK
+        Boolean isActive
         Boolean isDeleted
         Date createdAt
         Date updatedAt
@@ -184,25 +216,39 @@ erDiagram
     PAYMENT_METHODS {
         ObjectId _id PK
         String name
-        String type "card|bank_transfer|cash"
+        String provider
+        String type "card|bank|wallet|crypto|qr"
+        Number processingFee
         String description
-        String imageUrl
+        String apiKey
+        Array supportedCurrencies
+        String webhookUrl
         Boolean isActive
+        String imageUrl
+        Boolean isDeleted
+        ObjectId createdBy FK
+        ObjectId updatedBy FK
+        ObjectId deletedBy FK
         Date createdAt
         Date updatedAt
     }
-
+    
     PROMO_CODES {
         ObjectId _id PK
         String promoCode
-        Number discountPercentage
-        String color
-        String imageUrl
-        Array bindedEvents FK
-        Array bindedCategories FK
+        String title
+        String description
+        String discountType "percentage|fixed"
+        Number discountValue
+        Number minOrder
+        Number maxUses
+        Number currentUses
+        String status "active|inactive|expired"
+        String priority "low|medium|high"
+        Date startDate
+        Date endDate
         ObjectId createdBy FK
-        Date expirdAt
-        Boolean isActive
+        ObjectId updatedBy FK
         Boolean isDeleted
         Date createdAt
         Date updatedAt
@@ -220,6 +266,7 @@ erDiagram
         ObjectId paymentMethod FK
         Object discount "embedded"
         Date purchasedAt
+        ObjectId createdBy FK
         Date createdAt
         Date updatedAt
     }
@@ -227,6 +274,7 @@ erDiagram
     RIGHTS {
         ObjectId _id PK
         String type "website|app"
+        String group
         String name
         String description
         Boolean isDeleted
@@ -238,7 +286,14 @@ erDiagram
         ObjectId _id PK
         String type "website|app"
         String name
+        String description
+        String status "active|inactive"
+        Boolean superAdmin
+        Boolean organizationSuperAdmin
         Array associatedRights FK
+        ObjectId createdBy FK
+        ObjectId updatedBy FK
+        ObjectId organization FK
         Boolean isDeleted
         Date createdAt
         Date updatedAt
@@ -264,32 +319,100 @@ erDiagram
         Date updatedAt
     }
 
+    ORGANIZATIONS {
+        ObjectId _id PK
+        String name
+        String type "Company|Non-Profit|Government|School|Other"
+        String industry
+        String bio
+        String contactInfo
+        String email
+        String phone
+        String website
+        String logoUrl
+        ObjectId adminUserRequest FK
+        Boolean isActive
+        ObjectId createdBy FK
+        Date createdAt
+        Date updatedAt
+    }
+
+    OTP_TOKENS {
+        ObjectId _id PK
+        ObjectId userId FK
+        String email
+        String otp "first 3 digits"
+        String hashedOTP
+        String purpose "email_verification|password_reset|account_activation|phone_verification|two_factor_auth|account_recovery"
+        Date expiresAt
+        Number attempts "0..5"
+        Boolean used
+        Date usedAt
+        String requestIP
+        String userAgent
+        Date createdAt
+        Date updatedAt
+    }
+
+    APP_USERS {
+        ObjectId _id PK
+        Boolean isDeleted
+        String username
+        String firstName
+        String lastName
+        String phone
+        String password
+        String email
+        Date lastLogoutAt
+        Boolean isActive
+        Boolean emailVerified
+        String avatar
+        Date passwordChangedAt
+        Date createdAt
+        Date updatedAt
+    }
+
     %% Relationships
-    ADMIN_USERS ||--o{ ADMIN_USER_REQUESTS : "actionBy"
-    ADMIN_USERS ||--o{ CATEGORIES : "createdBy"
-    ADMIN_USERS ||--o{ EVENTS : "createdBy"
-    ADMIN_USERS ||--o{ TICKET_TYPES : "createdBy"
-    ADMIN_USERS ||--o{ PROMO_CODES : "createdBy"
-    ADMIN_USERS ||--o{ PASSWORD_RESET_TOKEN : "adminUserId"
-    ADMIN_USERS ||--o{ SETUP_PASSWORD_TOKEN : "adminUserId"
+    ADMIN_USERS ||..|| ROLES : has_role
+    ADMIN_USERS ||..|| ORGANIZATIONS : belongs_to
+    ADMIN_USER_REQUESTS ||..|| ADMIN_USERS : action_taken_by
+    CATEGORIES ||..|| ADMIN_USERS : created_by
 
-    APP_USERS ||--o{ PASSWORD_RESET_TOKEN : "appUserId"
-    APP_USERS ||--o{ TICKETS : "userId"
+    EVENTS ||..|| ADMIN_USERS : created_by
+    EVENTS ||..|| CATEGORIES : has_category
+    EVENTS ||..|| ORGANIZATIONS : belongs_to
 
-    CATEGORIES ||--o{ EVENTS : "category"
-    CATEGORIES ||--o{ PROMO_CODES : "bindedCategories"
+    TICKET_TYPES ||..|| ADMIN_USERS : created_by
 
-    EVENTS ||--o{ TICKETS : "eventId"
-    EVENTS ||--o{ PROMO_CODES : "bindedEvents"
-    EVENTS }o--o{ TICKET_TYPES : "ticketTypes.name"
+    PAYMENT_METHODS ||..|| ADMIN_USERS : created_by
+    PAYMENT_METHODS ||..|| ADMIN_USERS : updated_by
+    PAYMENT_METHODS ||..|| ADMIN_USERS : deleted_by
 
-    TICKET_TYPES ||--o{ TICKETS : "ticketType"
+    PROMO_CODES ||..|| ADMIN_USERS : created_by
+    PROMO_CODES ||..|| ADMIN_USERS : updated_by
+    
+    TICKETS ||..|| APP_USERS : belongs_to_user
+    TICKETS ||..|| EVENTS : belongs_to_event
+    TICKETS ||..|| TICKET_TYPES : has_ticket_type
+    TICKETS ||..|| PAYMENT_METHODS : paid_by
+    TICKETS ||..|| ADMIN_USERS : discount_set_by
+    TICKETS ||..|| ADMIN_USERS : created_by
+    TICKETS ||..|| PROMO_CODES : applied_promo_code
+    
+    ROLES ||..|| RIGHTS : has_rights
+    ROLES ||..|| ADMIN_USERS : created_by
+    ROLES ||..|| ADMIN_USERS : updated_by
+    ROLES ||..|| ORGANIZATIONS : belongs_to
 
-    PAYMENT_METHODS ||--o{ TICKETS : "paymentMethod"
+    PASSWORD_RESET_TOKEN ||..|| ADMIN_USERS : belongs_to_admin_user
+    PASSWORD_RESET_TOKEN ||..|| APP_USERS : belongs_to_app_user
 
-    PROMO_CODES ||--o{ TICKETS : "discount.promoCode"
+    SETUP_PASSWORD_TOKEN ||..|| ADMIN_USERS : belongs_to_admin_user
 
-    RIGHTS ||--o{ ROLES : "associatedRights"
+    ORGANIZATIONS ||..|| ADMIN_USER_REQUESTS : requested_by
+    ORGANIZATIONS ||..|| ADMIN_USERS : created_by
+
+    OTP_TOKENS ||--|| APP_USERS : userId
 ```
 
 > **Note:** This ERD shows the MongoDB collections and their relationships. Embedded documents like `ticketTypes` in events and `discount` in tickets are noted with "embedded" labels.
