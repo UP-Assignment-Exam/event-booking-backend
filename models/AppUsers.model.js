@@ -19,6 +19,7 @@ const AppSchema = mongoose.Schema(
             required: [true, "Username must not be null"],
             trim: true,
         },
+        phone: String,
         password: { type: String, trim: true },
         email: {
             type: String,
@@ -33,6 +34,7 @@ const AppSchema = mongoose.Schema(
         lastLogoutAt: Date,
         isActive: Boolean,
         emailVerified: Boolean,
+        avatar: String,
         passwordChangedAt: Date,
     },
     { timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } }

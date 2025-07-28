@@ -1,24 +1,23 @@
 const dbUtil = require("../../../exports/db.export");
 const logger = require("../../../helpers/logger.helper");
 const util = require("../../../exports/util");
-const Categories = require("../../../models/Categories.model");
+const PaymentMethods = require("../../../models/PaymentMethods.model");
 
 const list = async (req, res) => {
   try {
-    const { keyword, pageNo, pageSize } = req.query;
+    const { pageNo, pageSize } = req.query;
 
     const query = {
-      isDeleted: { $ne: true }
+      isDeleted: { $ne: true },
+      isActive: { $eq: true }
     };
 
-    dbUtil.setLikeOrIfNotEmpty(query, ["title"], keyword);
-
-    const count = await Categories.countDocuments(query);
+    const count = await PaymentMethods.countDocuments(query);
     if (count === 0) {
       return util.ResListSuss(req, res, [], count);
     }
 
-    const rsp = await Categories.find(query, "title color iconUrl description")
+    const rsp = await PaymentMethods.find(query, "name provider type processingFee description supportedCurrencies")
       .sort({ createdAt: -1 })
       .skip(dbUtil.defaultPageNo(pageNo))
       .limit(dbUtil.defaultPageSize(pageSize));

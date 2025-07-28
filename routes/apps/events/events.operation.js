@@ -13,8 +13,8 @@ const list = async (req, res) => {
 
     dbUtil.setQueryBetweenDate(query, startDate, endDate, dateRangeType || "startDate");
     dbUtil.setLikeOrIfNotEmpty(query, ["title", "description"], keyword);
-    dbUtil.setIfNotEmpty(query, "organization", organization, "objectId");
-    dbUtil.setIfNotEmpty(query, "category", category, "objectId");
+    dbUtil.setIfNotEmpty(query, "organization", organization, { type: "objectId", skipValue: "all" });
+    dbUtil.setIfNotEmpty(query, "category", category, { type: "objectId", skipValue: "all" });
 
     const count = await Events.countDocuments(query);
     if (count === 0) {
@@ -43,12 +43,10 @@ const getOne = async (req, res) => {
     };
 
     const rsp = await Events.findOne(query)
-      .populate("organization", "name type logoUrl")
-      .populate("category", "name color iconUrl")
-      .populate({
-        path: "ticketTypes.ticketTypeId",
-        select: "title description"
-      })
+      .populate("ticketTypes.ticketTypeId", "title imageUrl")
+      .populate("organization", "name type")
+      .populate("category", "title iconUrl");
+
 
     return util.ResSuss(req, res, rsp);
   } catch (error) {

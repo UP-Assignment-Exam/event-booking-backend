@@ -19,7 +19,7 @@ const authenticate = async (req, res, next) => {
         }
 
         // Determine which user model to use
-        const isAppRequest = req.path.startsWith('/app');
+        const isAppRequest = req.originalUrl.startsWith('/app');
         const UserModel = isAppRequest ? AppUser : AdminUser;
 
         const user = await UserModel.findOne({ _id: util.objectId(decoded.id) }).catch(error => { throw error });
