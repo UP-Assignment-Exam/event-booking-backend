@@ -8,8 +8,8 @@ const router = express.Router();
 router.post("/login", Operations.login);
 router.post("/register", Operations.register);
 router.post('/forgot-password', Operations.forgotPassword);
-router.get('/verify-otp', Operations.verifyOTP);
-router.get("/resend-otp", Operations.resendOTP)
+router.post('/verify-otp', Operations.verifyOTP);
+router.post("/resend-otp", Operations.resendOTP)
 router.post('/reset-password', Operations.resetPassword);
 router.post("/logout", Operations.logout)
 
