@@ -142,7 +142,7 @@ const register = async (req, res) => {
       const otpToken = new OTPToken({
         userId: savedUser._id,
         email: normalizedEmail,
-        otp: otp.substring(0, 3), // Store partial OTP for reference
+        otp: otp.substring(0, 2), // Store partial OTP for reference
         hashedOTP,
         purpose: 'email_verification',
         expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
@@ -345,7 +345,7 @@ const resendOTP = async (req, res) => {
     const otpToken = new OTPToken({
       userId: user._id,
       email: normalizedEmail,
-      otp: otp.substring(0, 3),
+      otp: otp.substring(0, 2),
       hashedOTP,
       purpose,
       expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
@@ -426,7 +426,7 @@ const forgotPassword = async (req, res) => {
     const otpToken = new OTPToken({
       userId: user._id,
       email: normalizedEmail,
-      otp: otp.substring(0, 3),
+      otp: otp.substring(0, 2),
       hashedOTP,
       purpose: 'password_reset',
       expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
