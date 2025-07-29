@@ -43,10 +43,10 @@ const login = async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { 
-        id: String(user._id), 
+      {
+        id: String(user._id),
         email: user.email,
-        username: user.username 
+        username: user.username
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
@@ -100,7 +100,7 @@ const register = async (req, res) => {
     const normalizedUsername = username.toLowerCase().trim();
 
     // Check if email already exists
-    const existingUser = await User.findOne({ 
+    const existingUser = await User.findOne({
       $or: [
         { email: normalizedEmail },
         { username: normalizedUsername }
@@ -108,6 +108,48 @@ const register = async (req, res) => {
     });
 
     if (existingUser) {
+      if (!existingUser.isActive && existingUser.email === normalizedEmail && existingUser.username === normalizedUsername) {
+        // Resend OTP
+        const otp = util.generateOTP();
+        const hashedOTP = util.hashToken(otp);
+
+        // Remove existing OTP tokens for this user (optional but recommended)
+        await OTPToken.deleteMany({
+          userId: existingUser._id,
+          purpose: 'email_verification'
+        });
+
+        const otpToken = new OTPToken({
+          userId: existingUser._id,
+          email: existingUser.email,
+          otp: otp.substring(0, 2),
+          hashedOTP,
+          purpose: 'email_verification',
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+          attempts: 0
+        });
+
+        await otpToken.save();
+
+        // Send email again
+        const userData = {
+          firstName: existingUser.firstName,
+          lastName: existingUser.lastName,
+          username: existingUser.username,
+          email: existingUser.email,
+          otp,
+          purpose: 'email_verification'
+        };
+
+        await EmailService.sendOTPEmail(userData);
+
+        return util.ResSuss(req, res, {
+          userId: existingUser._id,
+          email: existingUser.email,
+          message: "Verification code resent. Please check your email."
+        }, "Inactive account detected. Verification code resent.");
+      }
+
       if (existingUser.email === normalizedEmail) {
         return util.ResFail(req, res, "An account with this email already exists.");
       }
@@ -194,8 +236,8 @@ const verifyOTP = async (req, res) => {
       return util.ResFail(req, res, "Invalid email format.");
     }
 
-    if (otp.length !== 6) {
-      return util.ResFail(req, res, "OTP must be 6 digits.");
+    if (otp.length !== 4) {
+      return util.ResFail(req, res, "OTP must be 4 digits.");
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -259,13 +301,13 @@ const verifyOTP = async (req, res) => {
           isActive: true,
           emailVerifiedAt: new Date()
         });
-        
+
         // Generate JWT for immediate login
         const token = jwt.sign(
-          { 
-            id: String(user._id), 
+          {
+            id: String(user._id),
             email: user.email,
-            username: user.username 
+            username: user.username
           },
           process.env.JWT_SECRET,
           { expiresIn: '24h' }
@@ -530,7 +572,7 @@ const logout = async (req, res) => {
     // In a stateless JWT system, logout is handled client-side
     // But we can log the logout activity
     const userId = req.user?.id;
-    
+
     if (userId) {
       await User.findByIdAndUpdate(userId, {
         lastLogoutAt: new Date()
