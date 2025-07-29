@@ -11,6 +11,7 @@ let PORT = process.env.PORT || 8080
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
+    'http://localhost:58140',
     "http://event-book-admin.s3-website-ap-southeast-2.amazonaws.com"
 ];
 
