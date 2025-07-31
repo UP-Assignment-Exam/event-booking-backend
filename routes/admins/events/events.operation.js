@@ -75,9 +75,9 @@ const getStatic = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate } = req.body;
+    const { imageUrl, location, title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate } = req.body;
 
-    const upData = { title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate, createdBy: req.user._id, isDeleted: false };
+    const upData = { imageUrl, location, title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate, createdBy: req.user._id, isDeleted: false };
 
     if (req.user.organization) {
       upData.organization = req.user.organization;
@@ -135,9 +135,9 @@ const list = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate } = req.body;
+    const { imageUrl, location, title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate } = req.body;
 
-    const upData = { title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate };
+    const upData = { imageUrl, location, title, description, organization, category, ticketTypes, isPurchasable, disabledPurchase, startDate, endDate };
 
     if (req.user.organization) {
       upData.organization = req.user.organization;

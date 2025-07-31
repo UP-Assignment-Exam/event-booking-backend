@@ -2077,7 +2077,7 @@ const sendOTPEmail = async (userData) => {
 
     const mailOptions = {
       from: {
-        name: 'Your App Name',
+        name: 'Event Booking',
         address: process.env.EMAIL_USER
       },
       to: userData.email,
@@ -2119,7 +2119,151 @@ const sendOTPEmail = async (userData) => {
   }
 };
 
+
+// ====================
+// EMAIL SERVICE FOR PASSWORD CHANGE NOTIFICATION
+// ====================
+
+const sendPasswordChangeNotification = async (userData) => {
+  try {
+    const { firstName, lastName, email, username } = userData;
+
+    const emailSubject = "Password Changed Successfully";
+
+    const emailBody = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .security-tip { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 20px; padding: 20px; color: #666; font-size: 14px; }
+          .button { display: inline-block; background: #667eea; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin: 15px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔒 Password Changed</h1>
+          </div>
+          <div class="content">
+            <h2>Hello ${firstName} ${lastName},</h2>
+            
+            <p>Your password has been successfully changed for your account (<strong>@${username}</strong>).</p>
+            
+            <div class="security-tip">
+              <strong>🛡️ Security Notice:</strong>
+              <ul>
+                <li>This change was made on ${new Date().toLocaleString()}</li>
+                <li>If you didn't make this change, please contact support immediately</li>
+                <li>Your account security is important to us</li>
+              </ul>
+            </div>
+            
+            <p><strong>What to do next:</strong></p>
+            <ul>
+              <li>Make sure to update your password in any saved locations</li>
+              <li>Consider enabling two-factor authentication for extra security</li>
+              <li>Never share your password with anyone</li>
+            </ul>
+            
+            <p>If you have any concerns about your account security, please don't hesitate to reach out to our support team.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="mailto:support@yourapp.com" class="button">Contact Support</a>
+            </div>
+          </div>
+          <div class="footer">
+            <p>This is an automated security notification from Event Booking</p>
+            <p>© 2024 Your Company Name. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const transporter = createEmailTransporter();
+
+    const mailOptions = {
+      from: {
+        name: 'Event Booking',
+        address: process.env.EMAIL_USER
+      },
+      to: email,
+      subject: emailSubject,
+      html: emailBody,
+      text: emailBody,
+      // High priority for OTP emails
+      priority: 'high',
+      headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'high'
+      }
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+
+    console.log('✅ Password change notification email sent successfully:', {
+      messageId: result.messageId,
+      to: email,
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to send password change notification:', error);
+    throw error;
+  }
+};
+
+// ====================
+// ALTERNATIVE SIMPLE TEXT VERSION
+// ====================
+const sendPasswordChangeNotificationSimple = async (userData) => {
+  try {
+    const { firstName, lastName, email, username } = userData;
+
+    const emailSubject = "Password Changed Successfully";
+
+    const emailBody = `
+Hello ${firstName} ${lastName},
+
+Your password has been successfully changed for your account (@${username}).
+
+Security Details:
+- Change made on: ${new Date().toLocaleString()}
+- Account: ${email}
+
+If you didn't make this change, please contact our support team immediately.
+
+Best regards,
+Your App Team
+
+---
+This is an automated security notification.
+    `;
+
+    const emailData = {
+      to: email,
+      subject: emailSubject,
+      text: emailBody
+    };
+
+    await EmailService.sendEmail(emailData);
+    return true;
+
+  } catch (error) {
+    console.error('Failed to send password change notification:', error);
+    throw error;
+  }
+};
+
 module.exports = {
+  sendPasswordChangeNotification,
+  sendPasswordChangeNotificationSimple,
   sendOTPEmail,
   createOTPEmailTemplate,
   createEmailTransporter,

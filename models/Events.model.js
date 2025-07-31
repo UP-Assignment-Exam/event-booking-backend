@@ -2,6 +2,12 @@ const { db, mongoose } = require("./settings/connection")
 
 const EventSchema = mongoose.Schema(
     {
+        imageUrl: {
+            type: String
+        },
+        location: {
+            type: String
+        },
         title: {
             type: String,
             required: [true, "Name must not be null"],

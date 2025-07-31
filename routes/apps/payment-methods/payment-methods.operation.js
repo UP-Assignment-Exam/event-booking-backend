@@ -17,7 +17,7 @@ const list = async (req, res) => {
       return util.ResListSuss(req, res, [], count);
     }
 
-    const rsp = await PaymentMethods.find(query, "name provider type processingFee description supportedCurrencies")
+    const rsp = await PaymentMethods.find(query, "name provider type processingFee description supportedCurrencies imageUrl")
       .sort({ createdAt: -1 })
       .skip(dbUtil.defaultPageNo(pageNo))
       .limit(dbUtil.defaultPageSize(pageSize));

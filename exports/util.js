@@ -218,6 +218,10 @@ function generateOTP(length = 4) {
   return otp;
 }
 
+const comparePassword = async (plainPassword, hashedPassword) => {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+};
+
 module.exports = {
     notEmpty,
     isEmpty,
@@ -232,5 +236,6 @@ module.exports = {
     ResListSuss,
     generateStrongPassword,
     hashedPassword,
-    generateOTP
+    generateOTP,
+    comparePassword
 }
